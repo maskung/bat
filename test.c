@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wiringPi.h>
+#include <wiringPiI2C.h>
  
 #define RELAY (int)14
 void setup() {

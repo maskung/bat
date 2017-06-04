@@ -1,11 +1,23 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <wiringPi.h>
+/*
+*
+* by Lewis Loflin www.bristolwatch.com lewis@bvu.net
+*
+* Using wiringPi by Gordon Henderson
+* https://projects.drogon.net/raspberry-pi/wiringpi/
+* This must be installed first.
+*
+* Port over lcd_i2c.py to C and added improvements.
+* Supports 16x2 and 20x4 screens.
+* This was to learn now the I2C lcd displays operate.
+* There is no warrenty of any kind use at your own risk.
+*
+*/
+
 #include <wiringPiI2C.h>
- 
-#define RELAY 15
-#define TRIG 4
-#define ECHO 5
+#include <wiringPi.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 // Define some device parameters
 #define I2C_ADDR   0x3f // I2C device address
 
@@ -33,81 +45,61 @@ void ClrLcd(void); // clr LCD return home
 void typeln(const char *s);
 void typeChar(char val);
 int fd;  // seen by all subroutines
- 
-void setup() {
-        wiringPiSetup();
-        pinMode(TRIG, OUTPUT);
-        pinMode(ECHO, INPUT);
-        pinMode(RELAY, OUTPUT);
- 
-        //TRIG pin must start LOW
-        digitalWrite(TRIG, LOW);
-        digitalWrite(RELAY, HIGH);
-        delay(30);
 
+int main()   {
 
-	fd = wiringPiI2CSetup(I2C_ADDR);
-	lcd_init(); // setup LCD
+  if (wiringPiSetup () == -1) exit (1);
 
+  fd = wiringPiI2CSetup(I2C_ADDR);
 
-        printf("set up successful\n");
-}
- 
-int getCM() {
-        //Send trig pulse
-        digitalWrite(TRIG, HIGH);
-        delayMicroseconds(20);
-        digitalWrite(TRIG, LOW);
- 
-        //Wait for echo start
-        while(digitalRead(ECHO) == LOW);
- 
-        //Wait for echo end
-        long startTime = micros();
-        while(digitalRead(ECHO) == HIGH);
-        long travelTime = micros() - startTime;
- 
-        //Get distance in cm
-        int distance = travelTime / 58;
- 
-        return distance;
-}
- 
-int main(void) {
-        //cat fly pass 
-        int distant;
+  //printf("fd = %d ", fd);
 
-        setup();
- 
-        while (1) {
-	    ClrLcd();
-            //find distant
-            distant  = getCM();
+  lcd_init(); // setup LCD
 
-            // if objects are in range not more than 100 centimetre
-            if (distant >= 20 && distant <= 100) {
-                digitalWrite(RELAY, LOW);
-		printf("Lamp On\n");
-	    	lcdLoc(LINE2);
-	    	typeln("Lamp On");
-            }else{
-		digitalWrite(RELAY, HIGH);    
-		printf("Lamp Off\n");
-		lcdLoc(LINE2);
-	    	typeln("Lamp Off");
-	    }
-	    lcdLoc(LINE1);
-	    typeln("Distance ");
-	    typeInt(distant);
-	    typeln(" cm");
-            printf("Distance: %dcm\n", distant);
-            delay(1000);
-            
+  char array1[] = "Hello world!";
 
+  while (1)   {
 
-        }
- 
-        return 0;
+    lcdLoc(LINE1);
+    typeln("Using wiringPi");
+    lcdLoc(LINE2);
+    typeln("Geany editor.");
+
+    delay(2000);
+    ClrLcd();
+    lcdLoc(LINE1);
+    typeln("I2c  Programmed");
+    lcdLoc(LINE2);
+    typeln("in C not Python.");
+
+    delay(2000);
+    ClrLcd();
+    lcdLoc(LINE1);
+    typeln("Arduino like");
+    lcdLoc(LINE2);
+    typeln("fast and easy.");
+
+    delay(2000);
+    ClrLcd();
+    lcdLoc(LINE1);
+    typeln(array1);
+
+    delay(2000);
+    ClrLcd(); // defaults LINE1
+    typeln("Int  ");
+    int value = 20125;
+    typeInt(value);
+
+    delay(2000);
+    lcdLoc(LINE2);
+    typeln("Float ");
+    float FloatVal = 10045.25989;
+    typeFloat(FloatVal);
+    delay(2000);
+  }
+
+  return 0;
+
 }
 
 
