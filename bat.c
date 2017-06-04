@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <wiringPi.h>
  
-#define RELAY 0
+#define RELAY 15
 #define TRIG 4
 #define ECHO 5
  
@@ -14,7 +14,7 @@ void setup() {
  
         //TRIG pin must start LOW
         digitalWrite(TRIG, LOW);
-        digitalWrite(RELAY, LOW);
+        digitalWrite(RELAY, HIGH);
         delay(30);
         printf("set up successful\n");
 }
@@ -52,11 +52,15 @@ int main(void) {
 
             // if objects are in range not more than 100 centimetre
             if (distant >= 20 && distant <= 100) {
-                digitalWrite(RELAY, HIGH);
-            }
+                digitalWrite(RELAY, LOW);
+		printf("Relay On\n");
+            }else{
+		digitalWrite(RELAY, HIGH);    
+		printf("Relay Off\n");
+	    }
             printf("Distance: %dcm\n", distant);
             delay(1000);
-            digitalWrite(RELAY, LOW);
+            
 
 
         }
